@@ -1,0 +1,110 @@
+Spring inyecta según el principio de hollywood: "No me llames ya te llamaremos"
+"no declares los objetos, ya te los inyectamos".
+
+Estamos en la versión 6 de spring.
+
+Spring Framework Documentation
+
+Overview
+Core
+
+IoC Container Overview, crea un sistema para inyección de
+dependencias.
+
+Springboot todo es automático.
+
+Spring Framework, es la base y tiene por objetivo facilitar
+todo el desarrollo de las apps empresariales java.
+
+Spring Data: SpringMongoDB, SpringJPA, etc.
+
+Spring Cloud: Solo si se conoce lo anterior, para escalar
+una applicación creada en arquitectura monolítica.
+Escalarlo horizontalmente requerirá muchos recursos al
+servidor. Entonces dividir el código en aps mas pequeñas
+se logra con spring cloud.
+
+Spring Security: autenticación.
+
+Maven es una tecnología para consruir proyectos.
+	Gestionar el ciclo de vida de los proyectos de software.
+	Crear un artefacto / Crear un desplegable 
+	pasar los tests.
+	cargar dependencias.
+	Gestionar el maven site (sitio web donde se muestren
+	documentación o reportes de resultados)
+	Desde que tenemos que hacer algo real, ofrecer un servicio, necesitamos maven.
+	
+	La manera más óptima de cargar spring es con springboot.
+	
+	Spring no es un lenguaje, es un conjunto de clases Java que ya están programadas por la comunidad de desarrolladores de spring, que nosotros vamos a utilizar para simplificarnos las operaciones, y centrarnos en la lógica de negocio.
+	
+El Artifact es el nombre
+El Group Id es por ejemplo el nombre de la empresa, o de un agrupador de proyectos.
+En el curso se le dio el nombre "org.springframework"
+
+En version todo lo que lleva snapshot significa que está en desarrollo.
+
+Las dependencias de spring se agregan buscando en mvnrepository.com, buscando "org.springframework".
+
+Spring Context, Spring Test, Spring Web, todos corresponden
+a distintas features de spring. 
+
+Muestra que Spring es muy modular.
+
+Al agregarlas al pom, maven va a descargar las dependencias automáticamente al recargar el proyecto (opción maven -> reload project)
+
+#### BEANS.XML
+
+El beans.xml van a ser objetos java normales gestionados por spring.
+Spring va a estar en toda la app. Va a arrancar un contenedor de beans en memoria y los va a poder inyectar en diversos lugares según la necesidad.
+
+El bean es un objeto java, gestionado por Spring, tal que Spring lo va a poder inyectar en cualquier sitio que sea necesario. Ya sea através de un atributo, de un método setter o de un constructor.
+
+El bean puede tener argumentos y demás cosas.
+
+Se puede hacer con anotaciones o con xml.
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="..." class="...">  
+		<!-- collaborators and configuration for this bean go here -->
+	</bean>
+
+	<bean id="..." class="...">
+		<!-- collaborators and configuration for this bean go here -->
+	</bean>
+
+	<!-- more bean definitions go here -->
+
+</beans>
+----------------------------------------------
+session 02
+Al trabajar con los beans, en spring, desde el archivo beans.xml vamos a poder crear tantos beans como queramos.
+En lugar de hacer objetos con los constructores con el operador new, los haremos a partir de spring. 
+"Le pedimos un objeto a spring"
+
+Si tuviese una interfaz calculadora (excel, casio, cientifica), podría tener muchos beans uno por cada implementación de la interfaz, y podría cambiar la calculadora inyectada como parámetro en el gestor, solamente cambiando el nombre escrito en ref del elemento constructor-arg.
+
+Concepto de Scope o alcance.
+
+scope en el bean puede ser singleton o prototype.
+Si no queremos que se pase siempre un singleton de esa clase, se crea con el scope="prototype"
+
+---------------------------------
+session 02
+En lugar de hacer para todas las clases que quiero se inyecten, tengo la opción de habilitar el escaneo automático con context
+<context:component-scan base-package="org.example" />
+
+le digo que escanee todo el paquete org.example para ver si hay algún bean.
+
+ahora bien, también hay que indicarle cuáles clases son beans con la anotación "@Component" en cada clase.
+
+el nombre utilizado en getBeans es el mismo que el nombre de la clase pero sin mayúsculas en la primera letra.
+----------------------------------
+session 03: Spring Data JPA
+
