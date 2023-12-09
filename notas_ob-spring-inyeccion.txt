@@ -107,4 +107,105 @@ ahora bien, también hay que indicarle cuáles clases son beans con la anotació
 el nombre utilizado en getBeans es el mismo que el nombre de la clase pero sin mayúsculas en la primera letra.
 ----------------------------------
 session 03: Spring Data JPA
+Es una familia de proyectos dentro de spring (a su vez spring es un ecosistema de tecnologías para la parte web desde base de datos, microservicios, seguridad, sesión (cuando hay una determinadas peticiones http en un período de tiempo) que est pensada para el acceso a base de datos de una manera consistente e independiente de la tecnologia utilizada. P ej si quiero migrar de postgress a mongo db, que no tenga que cambiar mi código de Java de Spring Data JPA.
+Entonces el objetivo de Spring Data JPA tiene por objetivo independizarse de la tecnología.
+
+JDBC es lo utilizado para hacer conexiones, crear la sentencia sql, procesarla.
+Por eso Spring Provee Spring Data JDBC, luego por encima está Spring Data JPA.
+
+Java Persistence Api es una api que se dedica a almacenar información, para persistir información (hacerla perdurar en el tiempo).
+
+Para entender cómo funcionaría por debajo JPA, hay que conocer bien las tecnologías específicas, por ejemplo:
+
+Podríamos tener un proyecto con
+	Spring Data JPA, que por debajo estaría utilizando
+		* JPA, y a su vez
+			* Hibernate (una librería de persistencia, hace la traducción de java a sql)
+				* JDBC
+
+	Spring Data JPA va a simplificar mucho el uso, pero sería recomendable entender JDBC y Hibernate por ejemplo.
+	
+Spring Boot, nos permite crear proyectos de spring, de manera super rápida y auto configurable. Y se puede empezar a utilizar para utilizar JPA sin configurar demasiadas cosas.
+
+En lugar de configurar beans, creás un proyecto Springboot y ya está todo configurado.
+
+Spring Initializr va a permitir crear proyectos de spring con springboot de manera super sencilla.
+
+Tipo de proyecto va a ser Maven, que nos deja agregar dependencias de manera cómoda.
+Lenguaje va a ser Java.
+Versión de springboot, la última. no spapshot, no preview.
+
+1 Group
+2 ArtifactID
+3 Name
+Tenemos que actualizar. 2 es el nombre del proyecto.
+
+Luego el packaging, lo dejamos en .jar
+war es para desplegar un tomcat. Springboot trae tomcat embebido.
+
+Para simplificar y trabajar con base de datos se va a cargar dos dependencias:
+
+- uno es Spring Data JPA, que va a permitir guardar datos de manera sencilla.
+- La otra es un driver de base de datos. Para no perder tiempo vamos a usar H2 que es una base de datos de tipo archivo o en memoria (dependiendo de cómo lo configuremos) sin necesidad de instalar mysql.
+
+Se crea una clase con método main. El punto de entrada a nuestra aplicación.
+Dicha aplicación tiene una única clase SpringApplication, con un método run, que está devolviendo un application context, es decir un contenedor de beans.
+
+Entonces a esto que genera Springboot automáticamente yo podría aplicarle el método getBean("..."), pero no se le va a dar ese uso, sino que se va a utilizar la app normalmente.
+
+APPLICATION PROPERTIES
+El archivo application.properties, que servirá por ejemplo en este caso para configurar la base de datos.
+
+CONSTRUCTORES
+.Normalmente estos frameworks hacen uso del constructor vacío y luego de inyectan los parámetros.
+- Un constructor con todos los parámetros para crear objetos manualmente de ser necesario.
+
+
+Persistencia / Creación de repositorio.
+Consiste en marcar las entidades que se van a persistir en la base de datos. Esto se hace escribiendo la anotación @Entity en la clase que se va a guardar con JPA.
+La clave primaria se anota con @Id sobre el atributo privado de la pk.
+Y con la anotación @GeneratedValue(strategy = GenerationType.IDENTITY), que establece que se va a generar incrementos automáticos e iguales en cada nuevo registro. También me refiero a la pk, en este caso sobre cómo se va generar en el id.
+
+Un registro de la entidad equivale a un registro de una tabla, y cada atributo corresponde a una columna.
+
+REPOSITORIO
+El repositorio le indica a spring boot que a partir de esa interfaz se tiene que crar un bean.
+Se indica con la anotación @Repository, y esa anotación tiene la misma ruta de dependencia que la que spring usa @Component para indicarle a spring que es un bean, "org.springframework" es la ruta que digo.
+
+La interfaz que modelizará el repositorio, se tiene que llamar igual que la entidad sobre la cual queremos persistir, seguido del sufijo Repository. Por ejemplo CocheRepository.
+
+Va a ser Spring quien implemente esta interfaz, no nosotros. Va a ser spring quien cree un objeto del tipo de esa interfaz.
+Spring va a escanear la interfaz, va a crear un bean y va a inyectar en cualquier parte de la aplicación
+
+Necesito crear una conexión, crear una sentencia, ejecutarla. Esto se va a hacer desde una clase Repositorio. Va a ser de una manera simplificada porque lo va a gestionar todo spring.
+
+A nivel práctico se consigue diciendo que la interfaz extiende JPARepository, haciendo click en esa interfaz JPARepository, se observa que tiene todos los métodos que van a permitir hacer CRUD (Create, Read, Update, Delete) .
+
+Lo único que hay que tner en cuenta que JpaRepository pide dos datos: el tipo de dato que quiero almacenar y el id, la pk. <T, ID>.
+
+entonces el extends quedaría por ejemplo
+
+public interface CocheRepository extends JpaRepository<Coche, Long> {
+}
+
+con esto solo en la interfaz CocheRepository y con la anotación correspondiente "@Repository" se va a poder guardar, recuperar, ordenar resultados, filtrar, paginar
+
+
+Volviendo a Main, cómo utilizamos todo esto?
+Normalmente desde donde podríamos hacer uso de todo esto es a través de un controlador, o desde un servicio. Pero a esa parte todavía no hemos llegado, y se va a hacer en próximas sesiones.
+Por ahora se va a hacer desde la aplicación principal Main. Lo que pasa es que el main, es un método´ estático y entonces no se va a poder usar inyección ahi.
+Spring me da esto:
+		SpringApplication.run(ObSpringbootDataApplication.class, args);
+pero quiero transformarlo para tener un context del que pueda extraer beans (que ya fueron anotados y van a poder ser generados automáticamente gracias a las anotaciones).
+
+	el run devuelve un ConfigurationApplicationContext, el cual extiende ApplicationContext.
+	ApplicationContext es la clase del objeto context, del cual se obtienen los beans.
+	
+	entonces puedo cambiarlo a:
+	
+	ApplicationContext context = SpringApplication.run(ObSpringbootDataApplication.class, args);
+	
+	CocheRepository repository = context.getBean(CocheRepository.class);
+	
+	System.out.println(repository.count()); // devuelve que hay 0 registros.
 
