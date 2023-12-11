@@ -124,6 +124,7 @@ Podríamos tener un proyecto con
 				* JDBC
 
 	Spring Data JPA va a simplificar mucho el uso, pero sería recomendable entender JDBC y Hibernate por ejemplo.
+	Si no se usara JPA se debería hacer y configurar muchas cosas con JDBC.
 	
 Spring Boot, nos permite crear proyectos de spring, de manera super rápida y auto configurable. Y se puede empezar a utilizar para utilizar JPA sin configurar demasiadas cosas.
 
@@ -209,3 +210,38 @@ pero quiero transformarlo para tener un context del que pueda extraer beans (que
 	
 	System.out.println(repository.count()); // devuelve que hay 0 registros.
 
+	Coche toyota = new Coche(null, "Toyota", "Prius", 2023);
+	repository.save(toyota);
+	
+	System.out.println("El número de coches en la base de datos es: "+repository.count());
+-------------------------------------
+session04
+	Qué es spboot, cómo se crean proyectos con sb, qué tipos de dependencias vamos a encontrar, cómo emplearlas en nuestros proyectos, y cómo va a ser la gestión de dependencias en nuestro proyectos.
+	
+	la idea es que la programación con java sea más productiva, más sencilla..
+	SpringFramework es el core, el conjunto de clases, interfaces a partir de lo cual lo demás se basa.
+	Spring Data, de cara a conectarnos a una base de datos. Tanto para bd sql como no sql.
+	Spring boot, es spring auto configurado, un proyecto de spring normal necesita inicializar el contenedor de beans, 
+	Trae un servidor apache tomcat embebido. Sino con spring hay que descargar el apache tomcat. el 10 ya incluye jakarta. Habría sino que descargar del sitio de apache un servidor zip, descomprimirlo y configurarlo.
+	Trae sboot dependencias starter, que marcando una opción ya esta todo descargado y configurado.
+	La doc oficial es recomendale de ser leida.
+	start.spring.io es la pagina oficial de springboot.
+	
+	El starter son las dependencias maven. Agregándolo trae todas las dependencias necesarias para utilizar esa funcionalidad. Por ejemplo el starter de springboot, con tan solo agregarlo como una dependencia maven mas, tendremos lo necesario para crear aplicaciones web, por lo tanto trae todas las dependencias necesarias para crear controladores rest o controladores mvc, el apache tomcat embebido, jackson y todas las librerías necesarias para parsear a/de json y cosas varias para la parte web. Es decir que con tan solo agregar "una cosa" (starter), ese starter se va a encargar de traer lo de más. A nivel de código es como una dependencia maven más en el pom.
+	
+	Faltaría la parte web, que se quiere explorar en estas 3 sesiones (4,5,6): Cómo crear una api REST y en qué consiste eso. Para esto tenemos que agregar Spring Web, que nos va a proporcionar todo lo necesario para crear controladores, los cuales no son más que clases normales de java, con una notación especial arriba de todo. Esto va a poder crear controladores de tipo REST y controladores de tipo MVC. Controladores que reciben peticiones http y hacen algo con esas peticiones. Guardan en base de datos, por ej. En lugar de arrancar con un método main, reciben peticiones http en distintos métodos.
+	
+	Spring boot dev tools nos vaa permitir mejorar la experiencia de desarrollo, para que por ejemplo no tengamos que andar parando la app y volviendo a ejecutarla para desplegar los cambios en el apache tomcat embebido. Y conseguir una app web constantemente en ejecucióń.
+	
+	
+	en application.properties poner server.port=8081 y se cambia el puerto en el que se levanta el servidor de apache tomcat.
+	
+	Notaciones para persisitir en JPA con base de datos:
+	* @Entity, ccuidado que provenga de jakarta persistence app.
+	* @Id, jakarta persistence
+	* @GeneratedValue(strategy=GenerationType.IDENTITY)
+	* @Table(name="cualquierotronombre")
+	
+	* Interfaz p.ej. BookRepository extends JpaRepository<Book,Long>
+	
+	
