@@ -1,5 +1,7 @@
 package com.example.obspringbootdata;
 
+import com.example.obspringbootdata.entities.Coche;
+import com.example.obspringbootdata.repositories.CocheRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;

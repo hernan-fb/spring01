@@ -1,4 +1,4 @@
-package com.example.obspringbootdata;
+package com.example.obspringbootdata.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

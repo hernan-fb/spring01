@@ -209,3 +209,44 @@ pero quiero transformarlo para tener un context del que pueda extraer beans (que
 	
 	System.out.println(repository.count()); // devuelve que hay 0 registros.
 
+-------------------------------------------
+session 05
+Un servicio REST va a ser un punto de comunicación con la app pero desde el exterior (no desde el intellij). La app se va a ejecutar en un servidor, y cómo va a ser accesible? A través de peticiones http a un determinado puerto que la app va a estar escuchando, por defecto el 8080.
+Si yo tengo la ip, y el puerto (debería estar abierto para poder acceder), podemos acceder y hacer la consulta que hayamos programado.
+
+Necesitamos dos dependencias starter web y springweb dev tools (opcional esta última, para no tener que recompilar con cada cambio).
+Spring Web puede construir web apps con RESTful (devuelve datos en JSON, para intercambio de datos nativo de javascript) o con Spring MVC (devuelve html que el navegador va a interpretar). Rest permite acoplar el front con el back end
+y hacer arquitecturas de microservicios.
+
+Los microservicios, consiste en dividir una aplicación en piezas más pequeñas y manejables, independientes unas de otras pero que se puedan comunicar entre sí, tal que pueden ser reemplazadas en cualquier momento. Implica menores costos, mayor dificultad de implementación y mayor escalabilidad.
+
+Los datos llegarían desde un navegador o dispositivo movil por ej. 
+En el enfoque tradicional de arquitectura monolítica hay una sola app donde se despliega todo y cada vez manejarla es más dificil, y si estamos 10 personas durante años cada vez va a pesar más y mas, y la manera de escalar esa app es añadiendo más ram y cpu al servidor.
+Por contrario la alternativa springboot para escalarla se puede solucionar con mas recursos para uno o dos servicios. 
+
+Volviendo, necesitamos una clase que devuelva json para la comunciación con la interfaz exterior. A estas clases se les llama controladores, pues gestionan peticiones http.
+Luego tenemos Modelo, que tiene las entidades, repositorio y servicios.
+Luego Vista, las apps chiquitas entre si no necesitan compartirse la vista. La vista es solamente para que una persona en el navegador lo vea.
+
+En spring hay dos tipos de controladores:
+1. @RestController que nos va a permitir trabajar con json
+2. @Controller que nos permite cargar vistas en html, no lo vamos a utilizar. Es para SpringMVC. Aqui no tendríamos vistas.
+
+El controlador se crea con la anotación @RestController
+
+Ahora que la app empieza a crecer, se hace necesario crear un paquete para los controladores, otro para los modelos / entidades.
+Pero con cuidado, porque la notación @SpringBootApplication indica que tiene escaneo automático, por lo que no puedo mover la clase de la app principal, ni tampoco alejarme del paquete inicial.
+
+La publicación en internet se hace por una serie de anotaciones que tienen la palabra Mapping. Estas son:
+1. GetMapping
+2. PostMapping
+3. DeleteMapping
+4. PutMapping
+
+vienen de org.springframework.web, y de manera que llevan un parámetro string que es de url, de manera que cuando despliegue la aplicación, podré acceder con la url_servidor/parametro_en_string.
+
+Para que el proyecto se compile automáticamente se requieren varios pasos:
+1. tener agregada la dependencia SpringDevTools springweb dev tools
+2. Ir a settings -> Advanced Settings -> Allow auto-make to start even if developed application is currently running. (marcar esta opción)
+3. Ir a settings -> Build, Execution, Deployment -> Compiler -> Build project automatically (marcar esta opción)
+
