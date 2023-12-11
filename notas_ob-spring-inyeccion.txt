@@ -283,3 +283,77 @@ Para que el proyecto se compile automáticamente se requieren varios pasos:
 1. tener agregada la dependencia SpringDevTools springweb dev tools
 2. Ir a settings -> Advanced Settings -> Allow auto-make to start even if developed application is currently running. (marcar esta opción)
 3. Ir a settings -> Build, Execution, Deployment -> Compiler -> Build project automatically (marcar esta opción)
+
+
+REST quiere decir que los recursos van a estar identificables de manera unequívoca con una URL y van a ser recuperados independientemente de estados. Es decir es Stateless. No necesitaré ejecutar una secuencia de peticiones para que el servicio X funcione. Y se basa en los métodos de https para llevar a cabo las diferentes acciones de CRUD por ejemplo.
+
+En un método que se devuelve una lista de objetos, se observa en postman que llega un json. Esto es gracias a una librería llamada jackson que hace un parseo de java a json para algunos casos. (?)
+
+GET: Se utiliza para pedir información
+POST:	Se brinda información.
+PUT:	Se brinda información.
+DELETE: Es como el get pero para decirle que borre algo.
+---------------------------------------------
+Session 06:
+los input que vienen por ejemplo de la url en un método get, se mapean con la anotación y de la siguiente manera (hay dos opciones):
+Opción 1:
+@GetMapping("/url/{variable}")
+public Entidad metodo(@PathVariable Long variable)
+
+Opcion 2:
+@GetMapping("/url/{variable}")
+public Entidad metodo(@PathVariable("variable") Long otro_nombre_para_la_variable)
+
+OPTIONAL:
+Si estamos usando el método del repositorio jpa find by id, por ejemplo, esto no devuelve un objeto de la entidad directamente, sino que devuelve un objeto tipo Optional, al estilo de:
+Optional<Book>, que no es más que un wrapper para gestionar el caso de que se devuelva un objeto null.
+
+El optional entonces nos permite desenvolver tanto un null como un objeto en este ejemplo del tipo Book.
+
+Optional<Book> bookOpt = bookRepository.findById(id);
+- return bookOpt.orElse(null); // retorna book o null si bookOpt es nulo.
+
+El problema de esta última versión (y las anteriores) es que en caso de que la respuesta sea null el status_response es 200 (ok).
+Entonces habría que hacer lo siguiente:
+
+RESPONSE ENTITY:
+El response entity es un tipo especial de dato para spring framework para devolver respuestas http.
+
+if (bookOpt.isPresent()) {
+	return ResponseEntity.ok(bookOpt.get());
+} else {
+	return ResponseEntity.notFound().build();
+}
+//alternativa: if (bookOpt.isEmpty()) { ...
+
+//functional style:
+//return bookOpt.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+
+El notFound() es una cabecera pura, por eso se utiliza el build sin ningún parámetro.
+
+COLISION:
+Si hay una misma url para dos métodos iguales (ambos post, o ambos get, etc...) entonces hay colisión.
+
+Si hay una misma url para  para dos métodos distintos (por ej uno post y otro get) entonces no hay colisión.
+
+POST:
+    @PostMapping("/api/books")
+    public Book create(@RequestBody Book book) {
+        return repository.save(book);
+    }
+En este ejemplo se guarda directamente con las anotaciones @RequestBody.
+Vale aclarar que si hubiese que hacer algún procesamiento como validación, en una app real, se crearía una clase intermedia de tipo Servicio, y si hay un problema que se haga un roll back de los cambios de la base de datos. Por ahora eso no se va a hacer.
+
+La base de datos está reinicializándose en cada inicio del sistema, por lo que por ahora se borran todos los registros que se guarden con este método post.
+
+SI SE ENVIAN HEADERS EN EL METODO HTTP:
+
+Se pueden extraer con la anotación @RequestHeader y el tipo HttpHeader,
+
+public void utilizo_headers(@RequestHeader HttpHeader headers) {
+System.out.println(headers.get("User-Agent"));
+}
+
+El user agent imprime quién está enviando la solicitud, firefox, windows, linux, postman, un programa python, etc.
+
+Hay muchos ataques encaminados a determinados user-agents. Hay extensiones que permiten cambiarlo.

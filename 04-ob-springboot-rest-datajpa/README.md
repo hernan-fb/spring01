@@ -17,3 +17,9 @@ Orden de construcción:
 2.Book Repository   Repositorio, interfaz
 
 4.Book Controller
+    1. Buscar todos los libros
+    2. Buscar un libro solamente
+    3. Crear un nuevo libro
+    4. Actualizar un libro existente
+    5. Borrar un libro
+    6. Borrar todos los libros
