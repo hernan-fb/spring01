@@ -1,6 +1,6 @@
-package com.example.obspringbootdata.repositories;
+package com.example.obspringbootdata;
 
-import com.example.obspringbootdata.entities.Coche;
+import com.example.obspringbootdata.Coche;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
