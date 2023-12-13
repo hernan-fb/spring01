@@ -357,3 +357,48 @@ System.out.println(headers.get("User-Agent"));
 El user agent imprime quién está enviando la solicitud, firefox, windows, linux, postman, un programa python, etc.
 
 Hay muchos ataques encaminados a determinados user-agents. Hay extensiones que permiten cambiarlo.
+
+-----------------------------------------
+Session 07
+Si llamamos al método de getById un número que no existe, nos devuelve 404 not found.
+Pero si ingresamos cualquier texto que no pueda ser un id, nos devuelve 400 bad request, con un json con una trace de una excepción.
+
+en application.properties se puede configurar el parámetro server.error por ejemplo setearlo a:
+
+server.error.include-message=never
+server.error.include-stacktrace=never
+
+de manera de no violar el encapsulamiento de la implementación. En otras palabras, esto podría dar problemas de seguridad si fuese visible desde el exterior mediante las trazas de error.
+
+junto al response entity se puede acoplar un dataTransferObject para mandar mensajes por ejemplo al crear un libro con el nombre repetido.
+
+UPDATE ON DATA BASE PutMapping
+Normalmente para actualizar un registro, se usa el método Put de http. Para crear se usa Post.
+Esto es una convención.
+
+para esto se hace análogamente a los otros casos, ahora con la anotación @PutMapping
+
+Las cabeceras del request se utilizan para enviar información al servidor.
+
+TimeZone, nro de pagina, sistema operativo, nro de elementos que queremos recuperar...
+
+Lo normal en el update es llamar a una clase entre medio, y que el guardar lo haga esa clase intermedia. Es muy común recuperar el objeto original de la base de datos y mediante los setter guardando cada una de las propiedades que cambiaron.
+De esa manera se tiene el cuidado de preservar la información de cambios indebidos.
+
+Los errores van gestionados en la capa de servicios para que el controlador no quede tan cargado.
+
+## Borrar DELETEMAPPING
+
+    @DeleteMapping("/api/book/{id}")
+    public ResponseEntity<Book> delete(@PathVariable Long id) {
+        repository.deleteById(id);
+        return ResponseEntity.noContent().build();
+	}
+Existe el concepto de integridad referencial, y entonces si necesitamos borrar un libro del cual dependen otras tablas, si no lo configuramos bien se puede generar una excepción.
+Por eso en caso de borrado conviene capturar las excepciones y gestionarlas.
+
+------------------------------------------
+Session 08
+
+SWAGGER
+se va a usar una dependencia llamada Spring Fox boot starter, que tiene un sitio "SpringFox Reference Documentation"
