@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 public class BookController {
@@ -27,7 +29,8 @@ public class BookController {
     }
     // Buscar según su id
     @GetMapping("/api/book/{id}")
-    public ResponseEntity<Book> findOne(@PathVariable Long id) {
+    @Operation()
+    public ResponseEntity<Book> findOne(@Parameter @PathVariable Long id) {
         Optional<Book> bookOpt = repository.findById(id);
         if (bookOpt.isPresent()) {
             return ResponseEntity.ok(bookOpt.get());

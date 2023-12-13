@@ -402,3 +402,40 @@ Session 08
 
 SWAGGER
 se va a usar una dependencia llamada Spring Fox boot starter, que tiene un sitio "SpringFox Reference Documentation"
+
+Swagger es una herramienta de código abierto para diseñar, construir, documentar y consumir servicios web RESTful. Proporciona una interfaz de usuario para la documentación de API y permite a los desarrolladores probar y depurar sus servicios web.
+
+Springfox, por otro lado, es una biblioteca de código abierto que se integra con Spring Framework para generar documentación de API en formato Swagger. Proporciona anotaciones específicas de Spring para documentar los controladores de Spring MVC y los servicios RESTful.
+
+En resumen, Swagger es una herramienta independiente para diseñar y documentar servicios web RESTful, mientras que Springfox es una biblioteca que se integra con Spring Framework para generar documentación de API en formato Swagger.
+
+Las clases respectivas a esta funcionalidad van a estar en un paquete específico llamado "config" en el mismo nivel que los otros paquetes (entities, controller, repositories)
+
+Así como las clases de controladores tienen la anotación @Controller y el paquete de entidades tiene la anotación @Entity, las clases del paquete config van a tener la anotación @Configuration
+
+
+Lo primero que vamos a generar es un método api, que devuelve un objeto Docket.
+
+Este objeto Docket sigue el patrón de diseño Builder, y está pensado para ser la interfaz primaria en el framework SpringFox.
+
+Al método api se le pone la anotación @Bean para indicar que es un bean que debe ser inyectado a disposición dicho objeto, donde corresponda.
+Va agenerar una web, la documentación dinámicamente. Si yo creo un nuevo método, se va a crear y actualizar esa documentación.
+
+Al ser un builder, se puede hacer lo que se conoce como "method Chaining" y hacer sucesivas llamadas concatenando métodos porque siempre devuelve el mismo objeto builder, todo en la misma linea de código. 
+
+http://localhost:8080/swagger-ui/index.html
+
+Agregar esta dependencia, ya que springfox funciona con swagger y este a su vez utiliza la capa de spring doc
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.0.2</version>
+        </dependency>
+		
+La visualización de la documentación es swagger ui, pero la documentación en si es spring doc
+
+en application.properties
+springdoc.pathstomatch = 
+
+poner los paths de los controladores que quiero que se publiquen. De esta manera puedo ocultar algun paquete.
