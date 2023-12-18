@@ -439,3 +439,64 @@ en application.properties
 springdoc.pathstomatch = 
 
 poner los paths de los controladores que quiero que se publiquen. De esta manera puedo ocultar algun paquete.
+
+No anduvo Swagger por si mismo, asique hay que usar otro framework, como OpenApi
+
+========================================================================================================
+
+Session 09 testing con Junit
+
+Testing automatizado: Código que prueba el código. No es manual.
+
+Testing unitario prueba las unidadesde código.
+
+Por ej se puede testear los controladores, ...etc
+
+En cuanto a la clase generada en el package test, si cada método no tiene el @Test como anotación, no permite ejecutar nada. Es decir que para que sea un test debe tener esa anotación. Generalmente su nombre termina por la palabra Test.
+
+Para testear un controlador, tengo que lanzar peticiones http y recibir respuestas response entity, por lo cual hay que testear de una manera particular.
+Una manera de hacer esto es la siguiente:
+Empezamos mediante la anotación 
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT )
+
+Seguido creo un objeto privado
+
+private TestRestTemplate testRestTemplate;
+
+entrando con ctrl click se puede ver y descargar los sources y leer el javadoc.
+
+Luego creo un 
+
+@Autowired
+private RestTemplateBuilder restTemplateBuilder;
+
+el cual nos va a permitir construir el TestRestTemplate indicándole la url. Y lo creamos con la anotación autowired para decirle a Spring que lo inyecte automáticamente.
+
+En un método beforeEach voy a setear la url y el puerto al que vamos a hacer peticiones en cada método de test.
+
+SetUp method es un método que se ejecuta antes de cada método.
+BeforeClass method es un método que se ejecuta antes de todos los métodos de la clase.
+TearDown method es un método que se ejecuta después de cada método de la clase.
+AfterClass method es un método que se ejecuta después de todos los métodos (quizás sea antes de borrar la instancia con el garbage collector? No lo sé).
+
+    @LocalServerPort
+    private int port;
+	/* otra manera equivalente
+	@Value("${local.server.port}")
+	private int port;
+	*/
+
+@BeforeEach
+    void setUp() {
+        restTemplateBuilder = restTemplateBuilder.rootUri("http://localhost:"+port);
+        testRestTemplate = new TestRestTemplate(restTemplateBuilder);
+    }
+	
+el testRestTemplate nos va a permitir generar los métodos http.
+
+En lugar de hacer las llamadas desde postman o desde swagger (desde el navegador), se hace automáticamente desde java como distintos tests.
+
+
+
+
+
