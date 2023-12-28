@@ -475,7 +475,7 @@ el cual nos va a permitir construir el TestRestTemplate indicándole la url. Y l
 En un método beforeEach voy a setear la url y el puerto al que vamos a hacer peticiones en cada método de test.
 
 SetUp method es un método que se ejecuta antes de cada método.
-BeforeClass method es un método que se ejecuta antes de todos los métodos de la clase.
+BeforeClass method es un método que se ejecuta antes de todos los métodos de la clase. @BeforeAll debe ser un método estático, ya que se ejecuta antes de todas las pruebas de la clase y no tiene acceso a las instancias de la clase.
 TearDown method es un método que se ejecuta después de cada método de la clase.
 AfterClass method es un método que se ejecuta después de todos los métodos (quizás sea antes de borrar la instancia con el garbage collector? No lo sé).
 
@@ -496,7 +496,81 @@ el testRestTemplate nos va a permitir generar los métodos http.
 
 En lugar de hacer las llamadas desde postman o desde swagger (desde el navegador), se hace automáticamente desde java como distintos tests.
 
+testRestTemplate.getForEntity("/hola",String.class);
+
+hay que decirle qué tipo de dato va a ser esperado.
+
+nos devuelve un ResponseEntity.
+
+ResponseEntity<String> en este caso.
+
+El response entity tiene todos los datos de una peticion http:
+	-status (sting)
+	-status code (int)
+	-body
+	-headers
+por ejemplo quiero comprobar el status_code
+
+==============================================
+Session 10
+
+Apache Maven además de agregar y gestionar dependencias, tiene una serie de plugins vinculados al ciclo de vida del proyecto. Donde hay 3 ciclos de vida principales: Default, Clean y Site.
+
+Algunas de las fases más empleadas son:
+- Fase Clean, es para limpiar la carpeta target. Esta carpeta, se genera automáticamente, y el contenido de la misma es los ejecutables de la app.
+- Fase Validate
+- Fase Compile
+- Fase test
+- Fase Package
+- Fase Verify
+- Fase Install
+- Fase Site
+- Fase Deploy
+
+De esas fases, las fases del ciclo de vida de Clean son:
+	- pre-clean
+	- clean
+	- post-clean
+	El ciclo de vida clean es para borrar la carpeta tarjet, para que en la próxima ejecución todo parta desde cero y no se extiendan los problemas de una compilación a la siguiente.
+	
+las fases del ciclo de vida Default son:
+	- validate
+	- initialize
+	- generate-resources
+	- process-resources
+	- compile, compilar el código
+	- process-classes
+	- generate-test-resources
+	- process-test-resources
+	- test-compile
+	- process-test-classes
+	- test, pasar los tests
+	- prepare-package
+	- package, empaquetar la aplicación en un formato distribuible, por ej en formato JAR (teniendo instalado java podremos ejecutar la applicacion).
+	- pre-integration-test
+	- integration-test
+	- post-integration-test
+	- verify
+	- install, instala el mismo artefacto generado. Porque al jar se le asocia un artefacto (artifact). Con install se instala el artefacto en el repositorio local, por si desde otro proyecto lo necesito.
+	- deploy
+	
+El ciclo de vida site, nos permite crear la documentación de la web, nos permitiría generar una página web que se auto genera con reportes varios. Y sus fases son:
+	- pre-site
+	- site
+	- post-site
+	- site-deploy
 
 
+Es decir, mientras estamos en la fase de desarrollo, está bien ejecutar la aplicación desde el run del intellij, pero una vez la app realizada, en un servidor no bastaría esto. Para conseguir un ejecutable, en la pestaña Maven, en caso de que no aparezca se puede buscar desde view -> Tool Windows -> Maven. O sino se puede crear una configuración desde edit configurations -> + -> Maven -> poniéndolo en command line. 
+Pero teniendo las opciones por defecto en intellij, con darle doble click a la fase deseada ya es suficiente, porque se ejecuta el comando correspondiente que está preconfigurado.
+
+
+En la página web de Apache Maven, se indica que los ciclos de vida son:
+Default: Nos trae todas las fases más populares como: compilar el código(compile), hacer los tests (test), empaquetar la applicación (package) (con un comando java -jar, teniendo instalado java en nuestro sistema), install que instala el artefacto generado (artefacto es lo que se genera cuando se compila y empaqueta). AL trabajar con Maven tenemos un repositorio de artefactos gestionado por Maven.
+Clean : Para que en la próxima ejecución se parta de cero y no haya cacheo desde una construcción a la siguiente. Y no hayan problemas de una construcción a otra consrtucción.
+Site: que nos permitiría generar la documentación de la web.
+una página web que se autogenera con reportes de testing, etc.
+
+Podemos ejecutar package 
 
 
