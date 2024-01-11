@@ -571,6 +571,45 @@ Clean : Para que en la próxima ejecución se parta de cero y no haya cacheo des
 Site: que nos permitiría generar la documentación de la web.
 una página web que se autogenera con reportes de testing, etc.
 
-Podemos ejecutar package 
+Cada vez que con maven ejecutamos un comnado de un ciclo de vida de una fase, se van a ejecutar todas las fases previas.
+
+Podemos ejecutar package. Cada vez que se ejecuta package se ejecutan todas las etapas previas: compile, test y se generan los desplegables. Esto significa que package también va a compilar la aplicación.
+
+en la carpeta target se genera un archivo .jar, que viene de la sigla Java Archive. Con este archivo vamos a poder ejecutar la aplicación de la terminal.
+
+si voy con la linea de comandos con cd, y ls, puedo ejecutar el archivo con java (para eso hay que tener configurado la variable de entorno de java en el sistema).
+
+java --version
+
+<-- indica si tengo instalado java y si va a funcioanr el ejecutar el archivo jar.
 
 
+java -jar .\archivoDelProyecto.jar 
+
+<-- me va a arrancar la aplicación de spring igual a si la arranco con el botón de play.
+
+Este archivo, entonces, se puede llevar a un servidor que tenga java instalado.
+
+Lo que se suele hacer antes del package es el clean, de manera de vaciar la carpeta target antes de generar los archivos ejecutables que serán luego utilizados.
+
+APPLICATION.PROPERTIES
+
+app.message = mensaje desde el archivo application.properties
+
+puedo guardar variables de la app generales, o de configuración.
+
+Y cargarlas desde org.springframework.beans.factory.annotation.Value;
+
+@Value("${app.message}")
+String message;
+
+lo cual inyecta una propiedad del archivo application.properties dentro del código java.
+
+Todo lo que sean herramientas, configuraciones, base de datos, externos a java van a estar definidos en ese archivo, de manera de cambiar el archivo por otro y cambiar el comportamiento sin necesidad de recompilar el código java.
+
+
+Si tengo otros archivos .properties, hay una propiedad llamada: 
+
+spring.profiles.active=dev
+
+esto hace que podamos crear un jar y archivos .properties externos con propiedades diferentes, y que la misma aplicación funcione para múltiples entornos (prod y test por ejemplo, con distintas bases de datos y conexiones).
