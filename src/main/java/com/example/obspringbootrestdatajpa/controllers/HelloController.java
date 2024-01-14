@@ -9,7 +9,7 @@ public class HelloController {
     public String helloWorld() {
         return "Hello world... whats up!";
     }
-@GetMapping("bootstrap")
+    @GetMapping("/")
     public String otraURL() {
         return """
                 <!doctype html>
