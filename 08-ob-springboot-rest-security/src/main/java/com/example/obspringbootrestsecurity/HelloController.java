@@ -1,11 +1,11 @@
-package com.example.obspringbootrestdatajpa.controllers;
+package com.example.obspringbootrestsecurity;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HelloController {
-    @GetMapping("hola")
+    @GetMapping("holaabc")
     public String helloWorld() {
         return "Hello world... whats up!";
     }

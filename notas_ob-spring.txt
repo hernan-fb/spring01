@@ -612,4 +612,358 @@ Si tengo otros archivos .properties, hay una propiedad llamada:
 
 spring.profiles.active=dev
 
+en el archivo application.properties principal.
+
 esto hace que podamos crear un jar y archivos .properties externos con propiedades diferentes, y que la misma aplicación funcione para múltiples entornos (prod y test por ejemplo, con distintas bases de datos y conexiones).
+
+
+si agrego una linea llamada
+
+app.varexample= ${USERNAME}
+
+agregué una variable de entorno llamada USERNAME en la variable app.varexample
+
+en java las agarro con:
+
+```
+System.getenv().forEach(
+	(key, value) -> System.out.println(key+ " " + value)
+	);
+	}
+	
+```
+
+por ejemplo una contraseña puede viajar como variable de entorno de una manera más segura que no la vean todos.
+
+como cargar perfiles, como cargar variables entornos.
+Se puede hacer que un contenedor de docker se empaquete el jar, y que esa imagen docker se empaquete y descargue desde cualquier otro servidor, y se desplegaría la aplicación.
+ (complicado).
+ 
+==============================================
+Session 11
+
+para hacer un deploy en la nube, una opción sería que el archivo jar se suba manualmente a un servidor a través de ssh y ejecutarlo allí teniendo java instalado. Luego requeriría configurar los puertos, crear una url accesible, ajustar el firewall, el dns.
+Una opción más sencilla es un proveedor que nos de ese servicio, y simplemente con un click despliegue la aplicación.
+Tercera opción es heroku.com, primero crear una cuenta, y a partir de ahi acceder a un panel donde se puede crear aplicaciones de desplegado. Nos deja elegir el nombre, la región donde quiero se despliegue etc
+Se puede desplegar apps de manera gratuita, para una app básica hasta incluso con base de datos.
+Una es la herramienta que proporciona, pero involucra trabajar con varios comandos. La opción más rápida y sensilla es desplegarlo en github y de ahi pasarlo a heroku.
+
+es necesario crear el archivo system.properties, que va a servir para indicar a heroku qué versión de java utilizar para compilar la applicación. Y sino utilizará una por defecto lo que puede ocasionar problemas.
+```system.properties (a nivel de proyecto)
+java.runtime.version=17
+
+```
+Heroku al final no funciona gratis. Asique utilicé otro, llamado Koyeb.
+=========================
+Session 12 - Security
+
+Con solo agregar la dependencia de Spring Security en el initilizr de Spring, y si se agrega el controlador de /helloWorld no funciona si no se ingresa:
+- En el navegador: hay que ingresar user: user y password el indicado en la consola del intellij.
+- En postman: hay que ingresar en la solapa Authorization, la del tipo Basi Authorization, al igual que en el navegador: user: user y password: el indicado por intellij en la consola al iniciar.
+
+En postman genera una cookie, de manera que si después de generada se quita la autenticación puede que siga funcionando.
+Siempre que inicie la contraseña va a ser diferente, salvo si se configura.
+
+Para hacer la configuración, basta con agregar las anotaciones @Configuration y @EnableWebSecurity  a una clase nueva que extienda (o sea hija de) la clase WebSecurityConfigurerAdapter.
+La anotación @EnableWebSecurity es la que si se mira la documentación indica que extendiendo la clase WebSecurityConfigurerAdapter es que se puede modificar la configuración de Spring Security.
+
+Los métodos que hay que sobrescribir son en función del comportamiento que queramos modificar. Por ejemplo, el método configure(HttpSecurity): void, tiene una configuración por defecto. Se copia y se sobrescribe ese método en la clase nueva recién creada, pero incluyendo (o teniendo por referencia) la configuración por defecto.
+
+Por ejemplo, esto es lo inicial:
+@Configuration
+@EnableWebSecurity
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+	@Override 
+	protected void configure(HttpSecurity http) throws Exception {
+		http.authorizeRequests()
+		.antMatchers("/hola").permitAll() 	// esto es lo agregado al método. 
+											// "/hola" no necesita authenticación.
+		.anyRequest().authenticated()
+		.and()
+		.formLogin()
+		.and()
+		.httpBasic();
+	}
+}
+
+Se puede customizar bastante por ejemplo solicitando que el usuario tenga determinada autoridad para poder entrar, o que tenga determinada ip, entre otras cosas.
+
+En la versión nueva de spring, no recomienda hacer extends de WebSecurityConfigurerAdapter sino que dice 
+"Add this annotation to an @Configuration class to have the Spring Security configuration defined in any WebSecurityConfigurer or more likely by exposing a SecurityFilterChain bean:"
+Add this annotation to an @Configuration class to have the Spring Security configuration defined in any WebSecurityConfigurer or more likely by exposing a SecurityFilterChain bean:
+  @Configuration
+  @EnableWebSecurity
+  public class MyWebSecurityConfiguration {
+ 
+  	@Bean
+  	public WebSecurityCustomizer webSecurityCustomizer() {
+  		return (web) -> web.ignoring()
+  		// Spring Security should completely ignore URLs starting with /resources/
+  				.requestMatchers("/resources/**");
+  	}
+ 
+  	@Bean
+  	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  		http.authorizeHttpRequests().requestMatchers("/public/**").permitAll().anyRequest()
+  				.hasRole("USER").and()
+  				// Possibly more configuration ...
+  				.formLogin() // enable form based log in
+  				// set permitAll for all URLs associated with Form Login
+  				.permitAll();
+  		return http.build();
+  	}
+ 
+  	@Bean
+  	public UserDetailsService userDetailsService() {
+  		UserDetails user = User.withDefaultPasswordEncoder()
+  			.username("user")
+  			.password("password")
+  			.roles("USER")
+  			.build();
+  		UserDetails admin = User.withDefaultPasswordEncoder()
+  			.username("admin")
+  			.password("password")
+  			.roles("ADMIN", "USER")
+  			.build();
+  		return new InMemoryUserDetailsManager(user, admin);
+  	}
+ 
+  	// Possibly more bean methods ...
+  }
+  
+  En lugar del último bean del ejemplo, se puede agregar en application.properties
+  spring.security.user.name = Hernan
+  spring.security.user.password = 1234abc
+  
+Spring cualquier caracter extraño en la url es el punto de entrada a los hackers, entonces spring lo bloquea por defecto.
+Eso lanza una excepción por defecto y rechaza esa petición por ser potencialmente maliciosa.
+=========================
+Session 13 - Cifrado
+Historia del cifrado:
+1. Almacenar contraseñas en texto plano
+2. Almacenar contraseñas cifradas con una función hash
+3. Almacenar contraseñas cifradas con una función hash + salt
+el salt es una palabra generada aleatoriamente para cada registro. El atacante puede hacer comprobaciones sobre la contraseña original pero no puede considerar el salt facilmente. Sin embargo como se podría romper ese cifrado con procesadores muy potentes, existe 4.
+
+4. Almacenar contraseñas cifradas con una función adaptativa + factor de trabajo
+La seguridad se gana haciendo que la validación de contraseñas sea costosa computacionalmente. Su trade off es que afecta a las propias aplicaciones cada vez que se tiene que comprobar las contraseñas en las applicaciones.
+
+## Algoritmos en Spring Security, que básicamente hacen alguna de estas técnicas, todos hacen lo mismo, aunque cada uno de ellos lo realiza matemáticamente de una manera distinta.
+Es una validación que tiene que ser muy pesada y muy lenta para que ante un eventual atacante le cueste lo más posible.
+
+* BCrypt  
+* PBKF2   funciona mejor en gpus, entonces se usa menos.
+* scrypt  
+* argon2  
+
+##Bcrypt 
+Genera su propio salt de 16bytes.
+El resultado de cifrar con bcrypt será un string de 60 caracteres.
+
+$a versión
+$10 indica la fuerza. Se puede modificar, puede ir entre 4 y 31., cuanto mayor sea la fuerza más costozo hacer logins y también romper la contraseña. Perdemos rendimiento a costa de ganar seguridad, y en contraposición ganamos rendimiento en detrenimiento de la seguridad.
+
+Los 22 caracteres siguientes son el salt generado.
+
+BCryptPasswordEncoder, en general llevan el nombre del algoritmo delante y PasswordEncoder al final.
+
+viene de org.springframework.Security.Crypto
+
+ctrl + p dentro del paréntesis me dice todos los parámetros que puedo configurar.
+
+@Test
+void bcryptTest() {
+	BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+	for (int i = 0; i<10; i++) {
+		String hashedPassword = passwordEncoder.encode("admin");
+		System.out.println(hashedPassword);
+	
+		passwordEncoder.matches("admin", hashedPassword);
+		System.out.println(matches);
+	// lo que se va a probar es que gracias al salt se genera aleatoriamente cada vez
+	// si hackean un password de admin no van a poder hackear el otro porque está hasheado diferente.
+	}
+}
+
+@Test
+void bcryptCheckMultiplePasswords() {
+	BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+	for (int i = 0; i < 30; i++) {
+		System.out.println(passwordEncoder.encode("admin")
+	}
+	// a pesar de ser la misma contraseña, el resultado de cifrarla es diferente.
+	// no se pueden compromenter distintas cuentas con la misma contraseña gracias a esta característica.
+}
+
+@Test
+void pbkdf2() {
+	Pbkdf2PasswordEncoder passwordEncoder = new Pbkdf2PasswordEncoder();
+	for (int i = 0; i < 30; i++) {
+		System.out.println(passwordEncoder.encode("admin")
+	}
+}
+//implementan la misma interfaz, cada uno la hace a su manera matemáticamente. Entonces los strings cifrados tardan en generarse y tienen "otro aspecto" al implementar distinto algoritmo.
+
+@Test
+void argon() {
+	Argon2PasswordEncoder passwordEncoder = new Argon2PasswordEncoder();
+	for (int i = 0; i < 30; i++) {
+		System.out.println(passwordEncoder.encode("admin")
+	}
+}
+//implementan la misma interfaz, cada uno la hace a su manera matemáticamente. Entonces los strings cifrados tardan en generarse y tienen "otro aspecto".
+
+@Test
+void scrypt() {
+	ScryptPasswordEncoder passwordEncoder = new ScryptPasswordEncoder();
+	for (int i = 0; i < 30; i++) {
+		System.out.println(passwordEncoder.encode("admin")
+	}
+}
+//implementan la misma interfaz, cada uno la hace a su manera matemáticamente. Entonces los strings cifrados tardan en generarse y tienen "otro aspecto".
+
+Cómo lo utiliza spring?
+
+con un objeto passwordEncoder a partir de un constructor de un DelegatingPasswordEncoder y un hashmap de la siguiente manera ejemplo, que puede utilizar todas las técnicas vistas hasta recién.
+
+void springPasswordEncoders() {
+	Map<String, PasswordEncoder> encoders = new HashMap<>();
+	encoders.put("bcrypt", new BCryptPasswordEncoder());
+	encoders.put("pbkdf2", new Pbkdf2PasswordEncoder());
+	encoders.put("argon2", new Argon2PasswordEncoder());
+	encoders.put("scrypt", new ScryptPasswordEncoder());
+	encoders.put("noop", new NoOpPasswordEncoder.getInstance());
+	encoders.put("sha256", new StandardPasswordEncoder());
+	
+	PasswordEncoder passwordEncoder = new DelegatingPasswordEncoder("bcrypt", encoders);
+	
+}
+
+//los dos últimos están deprecados y no se recomiendan usar.
+
+--------------------------------------------------
+Session14 JWT
+
+jwt.io es un sitio que explica de qué va jwt,
+es un estandar abierto para autenticación de usuarios. Permite transmitir información entre dos partes de forma segura. Normalmente esta info es entre el navegador y el servidor.
+
+## Funcionamiento Session (si no se utiliza token)
+1. Cliente envia una petición a un servidor (/api/login) enviando el usuario y contraseña cifrada por ssl.
+
+2. Servidor valida username y password, y si no son válidos devolverá una respuesta 401 (unauthorized).
+
+3. Si si son válidos, Y se almacena el usuario en session. La session es un conjunto de peticiones seguidas durante un tiempo determinado. Después de 5h, dependiendo de la caducidad de la sesión probablemente haya expirado.
+
+4. Se genera una cookie en el Cliente.
+
+5. En próximas peticiones se comprueba que el cliente está en session. Si no está en sesión se pide de nuevo.
+
+Desventajas:
+- La información está en el servidor.
+- El token no está, hay una cookie en el lado cliente.
+- La información de la sesión se almacena en el servidor, lo cual consume recursos y por ejemplo, teniendo millones de usuarios dificulta la escalabilidad del proyecto.
+
+### Implementación en springboot.
+Es bastante sencillo, ya que el api rest puede recibir un parámetro http session, en cada sesión compruebas y listo.
+
+## Funcionamiento JWT.
+1. Cliente envia una petición a un servidor (/api/login) enviando el usuario y contraseña cifrada por ssl.
+
+2. Servidor valida username y password, y si no son válidos devolverá una respuesta 401 (unauthorized).
+
+3. Si si son válidos, va a generar un token JWT. Utiliza una secret key que está en el servidor.
+
+4. Servidor devuelve el token JWT generado al cliente.
+
+5. Cliente envía peticiones a los endpoints utilizando el token JWT en las cabeceras de los mensajes http.
+
+6. Servidor valida el token JWT en cada petición y si es correcto permite el acceso a los datos.
+
+Ventajas:
+- El token no se guarda en el servidor, por tanto no consume recursos en memoria del servidor, sino en el cliente. Esto permite mejor escalabilidad (brindar el servicio a más usuarios).
+
+Desventajas:
+- El token está en el navegador. No podríamos invalidarlo antes de la fecha de expiración asignada en el momento de creación.
+
+- Lo que se realiza es dar la opción de logout, lo cual simplemente borra el token.
+
+### Implementación en Springboot.
+Es más complejo, ya que normalmente requiere crear varias clases, un interceptador que genere las cabeceras, una clase que genere los token, otra clase para generar las cabeceras, etc.
+
+Es ampliamente aceptado por la simplificación de recursos del lado del servidor.
+
+### Estructura del token JWT
+
+Se va a almacenar en las cabeceras. Por ejemplo se va a poner en postman en las cabeceras.
+
+3 partes separadas por un punto. (.) y codificadas en base 64 cada una.
+
+1. HEADER
+
+```json
+{
+	"alg": "HSS12",
+	"typ": "JWT",
+}
+``` 
+
+2. PAYLOAD (Información, datos del usuario, no sensibles)
+
+```json
+{
+	"name": "",
+	"admin": true,
+}
+```
+
+3. SIGNATURE
+
+```
+HMACKSHA256(
+	base64UrlEncode(header) + "." +
+	base64UrlEncode(payload), secret
+
+```
+se codifica la información en base 64, y se le aplica el secret (un algoritmo para generar el token), ese secret está almacenado en el servidor y no se podría llegar a obtener nunca.
+
+Ejemplo del token generado:
+
+```
+
+```
+
+Nuestro user agent (navegador, ap, quien sea) envía el token JWT
+
+```
+Authorization: Bearer <token>
+```
+
+después del login el servidor devuelve el token en un json, y normalmente la app frontend lo agregará en las cabeceras.
+
+###Configuración spring:
+- Hay que crear un proyecto de spring con spring security, spring web, spring boot devtools (opcional) 
+- Spring Data JPA
+- PostgresSQL
+- Swagger si querés documentar.
+- y agregar una dependencia jwt (manualmente en el pom.xml, porque no está en el initializr) con artifact jjwt. groupid io.jsonwebtoken.
+
+--------------------------------------------------
+Session15
+
+DTO son Data Trasfer Object
+
+Se utilizan para transmitir datos, entre el postman por ejemplo y el backend. En lugar de postman puede ser cualquier frontend.
+
+Los DTO se van a convertir automáticamente a Json.
+
+Cuando desde el controlador devolvamos un objeto, en postman vamos a ver que aparece en json.
+
+-------------------------
+
+Los servicios son clases que normalmente situamos entre un controlador y un repositorio, con el objetivo de liberar carga a un controlador.
+
+Y como el repositorio es una interfaz, se pone el código o en el controlador o en el servicio. Si lo ponés en el controlador, se rompe el principio de única responsabilidad.
+
+
+
+

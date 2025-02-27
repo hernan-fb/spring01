@@ -1,7 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ada28043-4bf8-45dd-bd1d-452115b7856a" name="Changes" comment="" />
+    <list default="true" id="ada28043-4bf8-45dd-bd1d-452115b7856a" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/obspringbootrestdatajpa/ObSpringbootRestDatajpaApplication.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/obspringbootrestdatajpa/config/SwaggerConfig.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/obspringbootrestdatajpa/controllers/BookController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/obspringbootrestdatajpa/controllers/HelloController.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/obspringbootrestdatajpa/entities/Book.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/obspringbootrestdatajpa/repositories/BookRepository.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/classes/com/example/obspringbootrestdatajpa/services/BookPriceCalculator.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/test-classes/com/example/obspringbootrestdatajpa/ObSpringbootRestDatajpaApplicationTests.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/test-classes/com/example/obspringbootrestdatajpa/controllers/BookControllerTest.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/target/test-classes/com/example/obspringbootrestdatajpa/services/BookPriceCalculatorTest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,9 +32,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="2ZiYt6mXxR0HEWIcu3Npw4WbNjt" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -23,6 +42,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "master",
@@ -39,6 +59,8 @@
       <option name="presentableId" value="Default" />
       <updated>1702906578973</updated>
       <workItem from="1702906579972" duration="42000" />
+      <workItem from="1705262999316" duration="19000" />
+      <workItem from="1705263083850" duration="8000" />
     </task>
     <servers />
   </component>
